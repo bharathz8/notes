@@ -15,19 +15,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOTP = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const sendOTP = (email, otp) => __awaiter(void 0, void 0, void 0, function* () {
-    const transporter = nodemailer_1.default.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Your OTP Code',
-        text: `Your OTP is ${otp}`,
-    };
-    yield transporter.sendMail(mailOptions);
+    try {
+        // Create a transport using Gmail SMTP server
+        const transporter = nodemailer_1.default.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+        // Define the email options
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Your OTP Code',
+            text: `Your OTP is ${otp}`,
+            html: `<p>Your OTP is <strong>${otp}</strong></p>`,
+        };
+        // Send the email
+        const info = yield transporter.sendMail(mailOptions);
+        console.log(`Email sent: ${info.response}`);
+    }
+    catch (error) {
+        console.error(`Error sending email: ${error.message}`);
+        throw new Error('Failed to send OTP');
+    }
 });
 exports.sendOTP = sendOTP;
